@@ -7,6 +7,7 @@ import os
 import cmd
 import sys
 import logging
+import argparse
 from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler
 from pervision import analyse, afficher
@@ -80,6 +81,15 @@ class Pervision(cmd.Cmd):
 # Corps principale
 
 if __name__ == "__main__":
+    # Parse args
+    parser = argparse.ArgumentParser(description="Application for surveillance.")
+    parser.add_argument(
+        "path",
+        help="the path of the directory to monitore",
+    )
+
+    args = parser.parse_args()
+
     # Initialiser le logging, la façon dont les logs seront encoder
     logging.basicConfig(
         filename="watchdog.log",
