@@ -129,12 +129,14 @@ def analyse(chemin):
     global path  # Ne détecte pas la variable path
     path = chemin
 
-    time.sleep(
-        1
-    )  # On attend une second pour synchronisée les fichier réel avec Watchdog
-
     if os.path.exists(sys.argv[1]) is False:  # On vérifie si le répertoire existe
         os.system("cls" if os.name == "nt" else "clear")
+        # On va vider le fichier en l'ouvrant en écriture.
+        try:
+            with open("meta.csv", "w", newline="", encoding="utf-8") as csvfile:
+                files.clear()
+        except IOError as e:
+            print("Le fichier CSV n'a pas pu être éffacer : " + e)
         print("Le répertoire est innaccesible.")
         return 0
 
@@ -225,6 +227,9 @@ def afficher():
     )
     print(en_tete)
     print("-" * sum(largeur_colonnes.values()))  # Ligne de séparation
+
+    if not files:
+        print("Répertoire vide...")
 
     for donnee in files.items():
         nom = donnee[1].nom[: largeur_colonnes["Nom"]]  # Tronquer si nécessaire
