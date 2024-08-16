@@ -9,7 +9,7 @@ import sys
 import logging
 from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler
-from pervision import analyse
+from pervision import analyse, afficher
 
 # classe
 
@@ -22,6 +22,14 @@ def cls():
     os.system("cls" if os.name == "nt" else "clear")
 
 
+def any_event(event):
+    """
+    Cette fonction relance l'analyse des fichiers en cas d'évènements
+    """
+
+    analyse(sys.argv[1])
+
+
 class Pervision(cmd.Cmd):
     """
     Cette classe lance un modèle cmd permettant de créer une interface en ligne de commande
@@ -30,21 +38,21 @@ class Pervision(cmd.Cmd):
     """
 
     cls()
-    analyse(sys.argv[1])
     intro = "Pervision 1.0   Tapez help ou ? to pour afficher la liste des commandes.\n"
-    prompt = sys.argv[1] + " > "
+    prompt = sys.argv[-1] + " > "
     file = None
 
     # ----- basic enquete commands -----
 
     def do_pervision(self, arg):
-        "\n{logs} - Afficher le fichier log.\n\n{fichiers} - Afficher les fichiers.\n"
+        "\n{analyse} - Analyser le répertoire.\n\n{fichiers} - Afficher les fichiers actuelles.\n"
 
-        cls()
-        if arg == "logs":
-            print("logs")
+        if arg == "analyse":
+            cls()
+            analyse(sys.argv[1])
         elif arg == "fichiers":
-            print("fichiers")
+            cls()
+            afficher()
         else:
             print(
                 "Argument erroné, faites <help pervision> pour plus d'informations.\n"
@@ -55,6 +63,11 @@ class Pervision(cmd.Cmd):
 
         cls()
         print(os.system("dir " + sys.argv[1]))
+
+    def do_cls(self, arg):  # L'argument est nécessaire au bon fonctionnement
+        "Clear"
+
+        cls()
 
     def do_fermer(self, arg):  # L'argument est nécessaire au bon fonctionnement
         "Ferme le programme"
@@ -67,6 +80,7 @@ class Pervision(cmd.Cmd):
 # Corps principale
 
 if __name__ == "__main__":
+    # Initialiser le logging, la façon dont les logs seront encoder
     logging.basicConfig(
         filename="watchdog.log",
         filemode="a",
@@ -74,12 +88,14 @@ if __name__ == "__main__":
         format="%(asctime)s -%(process)d - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
+
     if (
         len(sys.argv) == 2
     ):  # On verifie si il n'y a que deux argument, l'application et le chemin du répertoire
         if os.path.exists(sys.argv[1]):  # On verifie que le réperoire existe
             if os.path.isdir(sys.argv[1]):  # Un répertoire ?
                 event_handler = LoggingEventHandler()
+                event_handler.on_any_event = any_event
                 observer = Observer()
                 observer.schedule(event_handler, sys.argv[1], recursive=True)
                 observer.start()
