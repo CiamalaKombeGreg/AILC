@@ -37,6 +37,18 @@ class TestFile(unittest.TestCase):
         self.assertEqual(self.file.datem, datetime(2020, 8, 10))
         self.assertEqual(self.file.taille, "1658")
 
+    def test_set(self):
+        """On teste les setter de la classe"""
+        self.file.nom = "changer"
+        self.file.datec = datetime(2024, 5, 12)
+        self.file.datem = datetime(2021, 11, 7)
+        self.file.taille = "5841"
+
+        self.assertEqual(self.file.nom, "changer")
+        self.assertEqual(self.file.datec, datetime(2024, 5, 12))
+        self.assertEqual(self.file.datem, datetime(2021, 11, 7))
+        self.assertEqual(self.file.taille, "5841")
+
     def test_analyse(self):
         """On va tester si on récupère les bonnes informations"""
         self.assertEqual(self.re_analyse("testdirectory", "testfile"), ["testfile", 5])
